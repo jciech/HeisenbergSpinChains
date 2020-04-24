@@ -1,5 +1,6 @@
 import scipy.sparse
 from MatrixMethods import makeHamiltonianJ, makeAFMSubSpace, makeSubSpace
+import argparse
 
 
 def saveMatrices(N, Sz):
@@ -67,4 +68,14 @@ def saveHamiltonians(N, rampdir):
     return
 
 if __name__ == '__main__':
-    saveMatrices(12,0)
+
+    # Script to allow running this file from terminal below, run using python SaveFiles.py -h
+    parser = argparse.ArgumentParser()
+    parser.add_argument("N", help = "The number of qubits in the spin chain", type = int)
+    parser.add_argument("Sz", help = "The value of Sz you wish to construct the transformation matrix for", type = int)
+    parser.add_argument("direction", help = "The direction of the ramp (forward/backward)", type = str)
+    args = parser.parse_args()
+
+
+    saveMatrices(args.N,args.Sz)
+    saveHamiltonians(args.N, args.direction)

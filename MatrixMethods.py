@@ -1,5 +1,6 @@
 import scipy.linalg
 import scipy.sparse
+import scipy.sparse.linalg
 from Helpers import *
 from sympy import *
 
@@ -222,7 +223,7 @@ def phaseCorrectAFM(N, vec):
     :param vec: full state space representation of antiferromagnetic ground state
     :return: Dephased representation of the antiferromagnetic ground state in the full space
     """
-    V = scipy.sparse.load_npz('V_' + str(N) + '_allJ_Sz_0subspace.npz')
+    V = scipy.sparse.load_npz('MatrixGeneration/V_' + str(N) + '_allJ_Sz_0subspace.npz')
     contVec = V.transpose() * vec
     phi = Symbol('phi')
     sol = solve(im(exp(-1j * phi) * contVec[0]), phi)[0]
