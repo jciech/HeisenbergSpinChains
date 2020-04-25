@@ -33,8 +33,7 @@ def initialiseSimulation(N, magneticorder, rampdir):
     return initialState, H, Htar, V, F
 
 
-def maxFidelityCostFunction(grad, simulationparameters=initialiseSimulation(13, 'AFM', 'forward')
-                            , dt=0.01, p=0.01):
+def maxFidelityCostFunction(grad, simulationparameters=None, dt=0.01, p=0.01):
     initialState, H, Htar, V, F = simulationparameters
 
     # Calculating the simulation time

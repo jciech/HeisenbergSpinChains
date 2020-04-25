@@ -201,16 +201,18 @@ def makeAFMSubSpace(N, Sz):
     return ss.tocsr()
 
 
-def makeStateAFM(N):
+def makeStateAFM(N, kopt=6):
     """
     The function computes the antiferromagnetic ground state by taking the lowest energy eigenvector for the
     Heisenberg Hamiltonian in the full state space for a chain of length N
 
     :param N: length of the chain
+    :param kopt: optional - specify the number of eigenvalues to be solved for by eigsh (default 6, specify less for
+    small chains
     :return: full state space representation of the antiferromagnetic ground state
     """
     H = makeHamiltonianJ(N, [1 for i in range(N - 1)])
-    eigval, eigvec = scipy.sparse.linalg.eigsh(H, k=6, which='SA')
+    eigval, eigvec = scipy.sparse.linalg.eigsh(H, k=kopt, which='SA')
     return eigvec[:, 0]
 
 
