@@ -7,8 +7,8 @@ if __name__ == '__main__':
 
     t_init = time.time()
     simTime, gradient = symbols('simTime gradient')
-    params = initialiseSimulation(19, 'AFM', 'forward')
-    print(maxFidelityCostFunction(20, simulationparameters=params, dt=0.01, p=0.01))
+    params = initialiseSimulation(21, 'AFM', 'forward')
+    print(maxFidelityCostFunction(20, 'AFM', simulationparameters=params, dt=0.01, p=0.01))
     elapsed = time.time() - t_init
     print(elapsed)
 
@@ -17,13 +17,3 @@ if __name__ == '__main__':
                                                                    #0.01, 0.01), n=10, iters=1, disp=True,
                                                                     #sampling_method='sobol')
     #print(result)
-
-
-
-
-
-
-
-
-
-
