@@ -216,6 +216,11 @@ def makeStateAFM(N, kopt=6):
     return eigvec[:, 0]
 
 
+def generateThermalStates(N, kopt=6):
+    H = makeHamiltonianJ(N,[1 for i in range(N-1)])
+    eigval, eigvec = scipy.sparse.linalg.eigsh(H, k=kopt, which='SA')
+    return [eigvec[:,i] for i in range(kopt)]
+
 def phaseCorrectAFM(N, vec):
     """
     The function computes the global phase of a given antiferromagnetic ground state and reduces it to 0
