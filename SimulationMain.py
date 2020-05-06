@@ -7,8 +7,9 @@ if __name__ == '__main__':
 
     t_init = time.time()
     simTime, gradient = symbols('simTime gradient')
-    params = initialiseSimulation(21, 'AFM', 'forward')
-    print(maxFidelityCostFunction(20, 'AFM', simulationparameters=params, dt=0.01, p=0.01))
+    order = 'AFM'
+    params = initialiseSimulation(11, order, 'forward')
+    print(maxFidelityCostFunction(3, 'AFM', magneticorder=order, simulationparameters=params, dt=0.01, p=0.01))
     elapsed = time.time() - t_init
     print(elapsed)
 

@@ -4,7 +4,6 @@ from MatrixMethods import makeStateAFM, phaseCorrectAFM, makeState
 from sympy import *
 import scipy.sparse
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def initialiseSimulation(N, magneticorder, rampdir, k=6):
@@ -41,7 +40,7 @@ def initialiseSimulation(N, magneticorder, rampdir, k=6):
 
     return initialState, targetState, H, Htar, V, F
 
-def maxFidelityCostFunction(grad, magneticorder, simulationparameters=None, dt=0.01, p=0.01):
+def maxFidelityCostFunction(grad, magneticorder=None, simulationparameters=None, dt=0.01, p=0.01):
     initialState, targetState, H, Htar, V, F = simulationparameters
 
     # Calculating the simulation time
@@ -80,6 +79,55 @@ def maxFidelityCostFunction(grad, magneticorder, simulationparameters=None, dt=0
 
         t_curr += dt
 
-    plt.plot([i * dt for i in range(len(f))], f)
-    plt.show()
     return -np.max(f)
+
+
+def maxFidelityNoisyChain(grad, magneticorder=None, simulationparameters=None,
+                          ramp=None, dt=0.01, p=0.01):
+    initialState, targetState, H, Htar, V, F = simulationparameters
+
+    # Calculating the simulation time
+    T = -2 * grad * atanh(2 * p - 1)
+
+    # Setting up the simulation
+    currentState = initialState
+    f = []
+    ramps = []
+    t_curr = 0
+    rampcounter = 0
+
+    while t_curr < 5 and rampcounter + 2 < len(ramp):
+        # Updating the Hamiltonian
+
+        Hcurr = (1 - ramp[rampcounter]) * H + ramp[rampcounter] * Htar
+        H_dt2 = (1 - ramp[rampcounter + 1]) * H + ramp[rampcounter + 1] * Htar
+        H_dt = (1 - ramp[rampcounter + 2]) * H + ramp[rampcounter + 2] * Htar
+
+        rampcounter = rampcounter + 2
+
+        # Performing the Runge-Kutta step
+        currentState = rungeKuttaStep(currentState, Hcurr, H_dt2, H_dt, dt)
+
+        # Renormalising the state
+        currentState = normalizeSparse(currentState)
+        if magneticorder == 'AFM':
+            # Transforming the state into the space to calculate fidelity
+            currentState_f = F.transpose() * V * currentState
+
+            # Appending current fidelity to array
+            f.append(abs(currentState_f).power(2).sum())
+
+        elif magneticorder == 'FM':
+            f.append(np.abs(np.dot(flatten(targetState.toarray()), flatten(currentState.toarray()))))
+
+        ramps.append(ramp[rampcounter])
+        t_curr += dt
+
+    # plt.figure(figsize=(8,6), dpi=70)
+    # plt.plot([i*dt for i in range(len(f))],f, color='blue')
+    # plt.plot([i*dt for i in range(len(ramps))],ramps, '--', color='red')
+    # plt.ylabel("Fidelity")
+    # plt.xlabel("$Jt$")
+    # plt.show()
+
+    return np.max(f)

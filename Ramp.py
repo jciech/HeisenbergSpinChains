@@ -1,4 +1,10 @@
+import numpy as np
 from sympy import *
+from sympy.utilities.lambdify import lambdify, implemented_function
+from sympy.abc import x
+
+f = implemented_function('f', lambda x: np.random.normal(0, sqrt(x)))
+lam_f = lambdify(x, f(x), modules=['numpy'])
 
 simTime, gradient = symbols('simTime gradient')
 
@@ -13,6 +19,10 @@ def tanhRamp(t, g, tmax):
     :return:
     """
     return 0.5 * (tanh((t - tmax / 2) / g) + 1)
+
+
+def tanhRampNoisy(t, g, n):
+    return (1 + (n * lam_f(t))) * 0.5 * (tanh((t + (2 * g * atanh((2 * 0.01) - 1) / 2)) / g) + 1)
 
 
 def rungeKuttaRamp(t, dt, grad, tmax):
@@ -58,6 +68,23 @@ def rungeKuttaRampNew(t, dt, grad, p):
     return [float(tanhRampNew(simTime, grad, p).subs(simTime, t)),
             float(tanhRampNew(simTime, grad, p).subs(simTime, t + dt / 2)),
             float(tanhRampNew(simTime, grad, p).subs(simTime, t + dt))]
+
+
+def generateNoisyRamp2(g, dt=0.005, p=0.01, n=0.03):
+    tmax = -2 * atanh(2 * p - 1)
+    ramp = []
+    t_curr = 0
+    while t_curr < 5:
+        p = float(tanhRampNoisy(t_curr, g, n))
+        if p > 0:
+            if p < 1:
+                ramp.append(p)
+            else:
+                ramp.append(1)
+        else:
+            ramp.append(0)
+        t_curr += dt
+    return ramp
 
 
 def rungeKuttaStep(state, Hamiltonian, Hamiltonian_later, Hamiltonian_latest, dt):
