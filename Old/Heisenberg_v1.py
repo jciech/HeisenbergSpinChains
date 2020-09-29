@@ -12,7 +12,7 @@ Sz = np.array([[1, 0], [0, -1]])
 # Some variables chosen initally for potential calculation
 # Note hbar will likely be taken to be 1. I am keeping it here should I ever need it.
 dt = 1
-hbar = 1.05 * np.power(10., -34)
+hbar = 1.05 * np.power(10.0, -34)
 
 
 def initialiseChain(N, configuration):
@@ -34,14 +34,17 @@ def initialiseChain(N, configuration):
     # The loop below constructs a vector of size 2^N through the Kronecker (tensor) product
     i = 0
     while i < N:
-        if (configuration[i] == 0):
+        if configuration[i] == 0:
             state = scipy.kron(state, up)
             i += 1
-        elif (configuration[i] == 1):
+        elif configuration[i] == 1:
             state = scipy.kron(state, down)
             i += 1
         else:
-            return "The configuration has not been specified correctly, please read the docstring"
+            return (
+                "The configuration has not been specified correctly, please read the"
+                " docstring"
+            )
 
     return state
 
@@ -54,7 +57,7 @@ def makeHamiltonian(N):
     :param N: integer length of the chain
     :return: 2**N x 2**N Hamiltonian of a chain of the specified length
     """
-    H = scipy.zeros([2**N,2**N], dtype=float)
+    H = scipy.zeros([2 ** N, 2 ** N], dtype=float)
 
     # We must loop over all nearest neighbour interactions to develop the Hamiltonian
     for interaction in range(N - 1):
@@ -70,7 +73,7 @@ def makeHamiltonian(N):
         # ensure correct dimensionality of the matrix
         # It's clear we are looking at nearest neighbours below
         for site in range(N):
-            if site == interaction or site == interaction+1:
+            if site == interaction or site == interaction + 1:
                 ProdX = scipy.kron(ProdX, Sx)
                 ProdY = scipy.kron(ProdY, Sy)
                 ProdZ = scipy.kron(ProdZ, Sz)
@@ -104,11 +107,9 @@ def evolveState(state, hamiltonian, timestep):
 if __name__ == "__main__":
     # We initialise the chain for 3 spins in the up-down-down configuration
     N = 4
-    initialState = initialiseChain(N, [1,0, 0, 0])
+    initialState = initialiseChain(N, [1, 0, 0, 0])
     # We create the Hamiltonian
     H = makeHamiltonian(N)
     print(H)
     # And evolve the state
     finalState = evolveState(initialState, H, dt)
-
-

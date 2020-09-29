@@ -14,7 +14,7 @@ Sz = np.array([[1, 0], [0, -1]])
 # Some variables chosen initally for potential calculation
 # Note hbar will likely be taken to be 1. I am keeping it here should I ever need it.
 dt = 1
-hbar = 1.05 * np.power(10., -34)
+hbar = 1.05 * np.power(10.0, -34)
 
 
 def countBits(x):
@@ -43,7 +43,7 @@ def intToBinary(x, N):
     :param N: Length of binary string required
     :return: Binary number of specified length
     """
-    return ('{0:0' + str(N) + 'b}').format(x)
+    return ("{0:0" + str(N) + "b}").format(x)
 
 
 def makeState(configuration):
@@ -70,7 +70,10 @@ def makeState(configuration):
             state = scipy.kron(state, up)
             i += 1
         else:
-            return "The configuration has not been specified correctly, please read the docstring"
+            return (
+                "The configuration has not been specified correctly, please read the"
+                " docstring"
+            )
 
     return state
 
@@ -137,6 +140,7 @@ def makeHamiltonian(N, initialState, SzList):
 
     return H
 
+
 def findTargetState(initialConfiguration):
 
     targetConfiguration = initialConfiguration.append(initialConfiguration[0])
@@ -144,6 +148,7 @@ def findTargetState(initialConfiguration):
     targetState = makeState(targetConfiguration)
 
     return targetState
+
 
 def fidelity(targetConfiguration, state):
     """
@@ -156,6 +161,7 @@ def fidelity(targetConfiguration, state):
     targetState = findTargetState(targetConfiguration)
     f = np.dot(targetState, state)
     return np.abs(f)
+
 
 def makeHamiltonianJ(N, J):
     """
@@ -217,11 +223,11 @@ def evolveState(state, hamiltonian, timestep):
 
 ############# TESTING BELOW ############################################################################################
 
-config = [1,0,0]
+config = [1, 0, 0]
 initialState = makeState(config)
 H = makeHamiltonian(3)
 
-t = [i*dt for i in range(75)]
+t = [i * dt for i in range(75)]
 S = [[] for i in range(len(initialState))]
 f = []
 currentState = initialState

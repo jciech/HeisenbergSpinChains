@@ -3,10 +3,10 @@ from sympy import *
 from sympy.utilities.lambdify import lambdify, implemented_function
 from sympy.abc import x
 
-f = implemented_function('f', lambda x: np.random.normal(0, sqrt(x)))
-lam_f = lambdify(x, f(x), modules=['numpy'])
+f = implemented_function("f", lambda x: np.random.normal(0, sqrt(x)))
+lam_f = lambdify(x, f(x), modules=["numpy"])
 
-simTime, gradient = symbols('simTime gradient')
+simTime, gradient = symbols("simTime gradient")
 
 
 def tanhRamp(t, g, tmax):
@@ -22,7 +22,11 @@ def tanhRamp(t, g, tmax):
 
 
 def tanhRampNoisy(t, g, n):
-    return (1 + (n * lam_f(t))) * 0.5 * (tanh((t + (2 * g * atanh((2 * 0.01) - 1) / 2)) / g) + 1)
+    return (
+        (1 + (n * lam_f(t)))
+        * 0.5
+        * (tanh((t + (2 * g * atanh((2 * 0.01) - 1) / 2)) / g) + 1)
+    )
 
 
 def rungeKuttaRamp(t, dt, grad, tmax):
@@ -37,9 +41,11 @@ def rungeKuttaRamp(t, dt, grad, tmax):
     :return: parameters for H at t, t+dt/2 and t+dt
     """
 
-    return [float(tanhRamp(simTime, grad, tmax).subs(simTime, t)),
-            float(tanhRamp(simTime, grad, tmax).subs(simTime, t + dt / 2)),
-            float(tanhRamp(simTime, grad, tmax).subs(simTime, t + dt))]
+    return [
+        float(tanhRamp(simTime, grad, tmax).subs(simTime, t)),
+        float(tanhRamp(simTime, grad, tmax).subs(simTime, t + dt / 2)),
+        float(tanhRamp(simTime, grad, tmax).subs(simTime, t + dt)),
+    ]
 
 
 def tanhRampNew(t, g, p):
@@ -65,9 +71,11 @@ def rungeKuttaRampNew(t, dt, grad, p):
     :return: parameters for H at t, t+dt/2 and t+dt
     """
 
-    return [float(tanhRampNew(simTime, grad, p).subs(simTime, t)),
-            float(tanhRampNew(simTime, grad, p).subs(simTime, t + dt / 2)),
-            float(tanhRampNew(simTime, grad, p).subs(simTime, t + dt))]
+    return [
+        float(tanhRampNew(simTime, grad, p).subs(simTime, t)),
+        float(tanhRampNew(simTime, grad, p).subs(simTime, t + dt / 2)),
+        float(tanhRampNew(simTime, grad, p).subs(simTime, t + dt)),
+    ]
 
 
 def generateNoisyRamp2(g, dt=0.005, p=0.01, n=0.03):

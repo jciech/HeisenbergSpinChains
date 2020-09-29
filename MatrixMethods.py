@@ -39,13 +39,13 @@ def makeHamiltonianJ(N, J):
         # It's clear we are looking at nearest neighbours below
         for site in range(N):
             if site == interaction or site == interaction + 1:
-                ProdX = scipy.sparse.kron(ProdX, Sx, format='csr')
-                ProdY = scipy.sparse.kron(ProdY, Sy, format='csr')
-                ProdZ = scipy.sparse.kron(ProdZ, Sz, format='csr')
+                ProdX = scipy.sparse.kron(ProdX, Sx, format="csr")
+                ProdY = scipy.sparse.kron(ProdY, Sy, format="csr")
+                ProdZ = scipy.sparse.kron(ProdZ, Sz, format="csr")
             else:
-                ProdX = scipy.sparse.kron(ProdX, S0, format='csr')
-                ProdY = scipy.sparse.kron(ProdY, S0, format='csr')
-                ProdZ = scipy.sparse.kron(ProdZ, S0, format='csr')
+                ProdX = scipy.sparse.kron(ProdX, S0, format="csr")
+                ProdY = scipy.sparse.kron(ProdY, S0, format="csr")
+                ProdZ = scipy.sparse.kron(ProdZ, S0, format="csr")
 
         H += Jtemp * (ProdX + ProdY + ProdZ)
 
@@ -85,21 +85,21 @@ def makeHamiltonianPerturbed(N, J, h):
         # There is also a term which is responsible for the perturbation h at each site
         for site in range(N):
             if site == interaction:
-                ProdX = scipy.sparse.kron(ProdX, Sx, format='csr')
-                ProdY = scipy.sparse.kron(ProdY, Sy, format='csr')
-                ProdZ = scipy.sparse.kron(ProdZ, Sz, format='csr')
-                hProd = scipy.sparse.kron(hProd, Sz, format='csr')
+                ProdX = scipy.sparse.kron(ProdX, Sx, format="csr")
+                ProdY = scipy.sparse.kron(ProdY, Sy, format="csr")
+                ProdZ = scipy.sparse.kron(ProdZ, Sz, format="csr")
+                hProd = scipy.sparse.kron(hProd, Sz, format="csr")
             elif site == interaction + 1:
-                ProdX = scipy.sparse.kron(ProdX, Sx, format='csr')
-                ProdY = scipy.sparse.kron(ProdY, Sy, format='csr')
-                ProdZ = scipy.sparse.kron(ProdZ, Sz, format='csr')
-                hProd = scipy.sparse.kron(hProd, S0, format='csr')
+                ProdX = scipy.sparse.kron(ProdX, Sx, format="csr")
+                ProdY = scipy.sparse.kron(ProdY, Sy, format="csr")
+                ProdZ = scipy.sparse.kron(ProdZ, Sz, format="csr")
+                hProd = scipy.sparse.kron(hProd, S0, format="csr")
 
             else:
-                ProdX = scipy.sparse.kron(ProdX, S0, format='csr')
-                ProdY = scipy.sparse.kron(ProdY, S0, format='csr')
-                ProdZ = scipy.sparse.kron(ProdZ, S0, format='csr')
-                hProd = scipy.sparse.kron(hProd, S0, format='csr')
+                ProdX = scipy.sparse.kron(ProdX, S0, format="csr")
+                ProdY = scipy.sparse.kron(ProdY, S0, format="csr")
+                ProdZ = scipy.sparse.kron(ProdZ, S0, format="csr")
+                hProd = scipy.sparse.kron(hProd, S0, format="csr")
 
         H += Jtemp * (ProdX + ProdY + ProdZ) - h * hProd
 
@@ -130,7 +130,10 @@ def makeState(configuration):
             state = scipy.sparse.kron(state, up, format="csr")
             i += 1
         else:
-            return "The configuration has not been specified correctly, please read the docstring"
+            return (
+                "The configuration has not been specified correctly, please read the"
+                " docstring"
+            )
 
     return state
 
@@ -159,7 +162,10 @@ def makeStateArray(configuration):
             state = scipy.kron(state, up)
             i += 1
         else:
-            return "The configuration has not been specified correctly, please read the docstring"
+            return (
+                "The configuration has not been specified correctly, please read the"
+                " docstring"
+            )
 
     return state
 
@@ -177,7 +183,9 @@ def makeSubSpace(N, Sz):
     ss = scipy.sparse.csr_matrix((0, 2 ** N), dtype=int)
     for i in range(2 ** N - 1):
         if countBits(i) == Sz:
-            ss = scipy.sparse.vstack([ss, makeState([int(j) for j in intToBinary(i, N)])])
+            ss = scipy.sparse.vstack(
+                [ss, makeState([int(j) for j in intToBinary(i, N)])]
+            )
 
     return ss.tocsr()
 
@@ -195,8 +203,10 @@ def makeAFMSubSpace(N, Sz):
     ss = scipy.sparse.csr_matrix((0, 2 ** N), dtype=int)
     for i in range(2 ** N - 1):
         if countBits(i) == Sz:
-            if intToBinary(i, N)[-1] == '1':
-                ss = scipy.sparse.vstack([ss, makeState([int(j) for j in intToBinary(i, N)])])
+            if intToBinary(i, N)[-1] == "1":
+                ss = scipy.sparse.vstack(
+                    [ss, makeState([int(j) for j in intToBinary(i, N)])]
+                )
 
     return ss.tocsr()
 
@@ -212,14 +222,15 @@ def makeStateAFM(N, kopt=6):
     :return: full state space representation of the antiferromagnetic ground state
     """
     H = makeHamiltonianJ(N, [1 for i in range(N - 1)])
-    eigval, eigvec = scipy.sparse.linalg.eigsh(H, k=kopt, which='SA')
+    eigval, eigvec = scipy.sparse.linalg.eigsh(H, k=kopt, which="SA")
     return eigvec[:, 0]
 
 
 def generateThermalStates(N, kopt=6):
-    H = makeHamiltonianJ(N,[1 for i in range(N-1)])
-    eigval, eigvec = scipy.sparse.linalg.eigsh(H, k=kopt, which='SA')
-    return [eigvec[:,i] for i in range(kopt)]
+    H = makeHamiltonianJ(N, [1 for i in range(N - 1)])
+    eigval, eigvec = scipy.sparse.linalg.eigsh(H, k=kopt, which="SA")
+    return [eigvec[:, i] for i in range(kopt)]
+
 
 def phaseCorrectAFM(N, vec):
     """
@@ -230,9 +241,9 @@ def phaseCorrectAFM(N, vec):
     :param vec: full state space representation of antiferromagnetic ground state
     :return: Dephased representation of the antiferromagnetic ground state in the full space
     """
-    V = scipy.sparse.load_npz('MatrixGeneration/V_' + str(N) + '_allJ_Sz_0subspace.npz')
+    V = scipy.sparse.load_npz("MatrixGeneration/V_" + str(N) + "_allJ_Sz_0subspace.npz")
     contVec = V.transpose() * vec
-    phi = Symbol('phi')
+    phi = Symbol("phi")
     sol = solve(im(exp(-1j * phi) * contVec[0]), phi)[0]
     phase = complex((exp(-1j * sol[re(phi)])).evalf())
 

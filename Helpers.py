@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse
 
+
 def countBits(x):
     """
     The function counts the number of 1's in the binary representation of a base 10 integer.
@@ -27,7 +28,7 @@ def intToBinary(x, N):
     :param N: Length of binary string required
     :return: Binary number of specified length
     """
-    return ('{0:0' + str(N) + 'b}').format(x)
+    return ("{0:0" + str(N) + "b}").format(x)
 
 
 def normalize(v):

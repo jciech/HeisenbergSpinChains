@@ -7,17 +7,21 @@ import numpy as np
 
 
 def initialiseSimulation(N, magneticorder, rampdir, k=6):
-    if magneticorder == 'AFM':
+    if magneticorder == "AFM":
         AFMState = makeStateAFM(N - 1, kopt=k)
         AFMState = phaseCorrectAFM(N - 1, AFMState)
         targetState = 0
         initialState_fs = scipy.sparse.kron([0, 1], AFMState).transpose()
 
         # Loading the sparse matrix V\dagger and
-        V = scipy.sparse.load_npz('MatrixGeneration/V_' + str(N) + '_allJ_Sz_1subspace.npz')
-        F = scipy.sparse.load_npz('MatrixGeneration/F_' + str(N) + '_allJ_Sz_1subspace.npz')
+        V = scipy.sparse.load_npz(
+            "MatrixGeneration/V_" + str(N) + "_allJ_Sz_1subspace.npz"
+        )
+        F = scipy.sparse.load_npz(
+            "MatrixGeneration/F_" + str(N) + "_allJ_Sz_1subspace.npz"
+        )
 
-    elif magneticorder == 'FM':
+    elif magneticorder == "FM":
 
         config = [0 for i in range(N - 1)]
         config.insert(0, 1)
@@ -28,19 +32,38 @@ def initialiseSimulation(N, magneticorder, rampdir, k=6):
         initialState_fs = makeState(config).transpose()
         targetState_fs = makeState(configtarget).transpose()
 
-        V = scipy.sparse.load_npz('MatrixGeneration/V_' + str(N) + '_allJ_Sz_' + str(-(N - 2)) + 'subspace.npz')
-        F = scipy.sparse.load_npz('MatrixGeneration/F_' + str(N) + '_allJ_Sz_' + str(-(N - 2)) + 'subspace.npz')
+        V = scipy.sparse.load_npz(
+            "MatrixGeneration/V_"
+            + str(N)
+            + "_allJ_Sz_"
+            + str(-(N - 2))
+            + "subspace.npz"
+        )
+        F = scipy.sparse.load_npz(
+            "MatrixGeneration/F_"
+            + str(N)
+            + "_allJ_Sz_"
+            + str(-(N - 2))
+            + "subspace.npz"
+        )
         targetState = V.transpose() * targetState_fs
 
     # Transforming initial state into contracted space
     initialState = V.transpose() * initialState_fs
 
-    H = scipy.sparse.load_npz('MatrixGeneration/Hinitial_' + str(N) + rampdir + magneticorder + '.npz')
-    Htar = scipy.sparse.load_npz('MatrixGeneration/Htarget_' + str(N) + rampdir + magneticorder +'.npz')
+    H = scipy.sparse.load_npz(
+        "MatrixGeneration/Hinitial_" + str(N) + rampdir + magneticorder + ".npz"
+    )
+    Htar = scipy.sparse.load_npz(
+        "MatrixGeneration/Htarget_" + str(N) + rampdir + magneticorder + ".npz"
+    )
 
     return initialState, targetState, H, Htar, V, F
 
-def maxFidelityCostFunction(grad, magneticorder=None, simulationparameters=None, dt=0.01, p=0.01):
+
+def maxFidelityCostFunction(
+    grad, magneticorder=None, simulationparameters=None, dt=0.01, p=0.01
+):
     initialState, targetState, H, Htar, V, F = simulationparameters
 
     # Calculating the simulation time
@@ -67,23 +90,30 @@ def maxFidelityCostFunction(grad, magneticorder=None, simulationparameters=None,
 
         # Renormalising the state
         currentState = normalizeSparse(currentState)
-        if magneticorder == 'AFM':
+        if magneticorder == "AFM":
             # Transforming the state into the space to calculate fidelity
             currentState_f = F.transpose() * V * currentState
 
             # Appending current fidelity to array
             f.append(abs(currentState_f).power(2).sum())
 
-        elif magneticorder == 'FM':
-            f.append(np.abs(np.dot(flatten(targetState.toarray()), flatten(currentState.toarray()))))
+        elif magneticorder == "FM":
+            f.append(
+                np.abs(
+                    np.dot(
+                        flatten(targetState.toarray()), flatten(currentState.toarray())
+                    )
+                )
+            )
 
         t_curr += dt
 
     return -np.max(f)
 
 
-def maxFidelityNoisyChain(grad, magneticorder=None, simulationparameters=None,
-                          ramp=None, dt=0.01, p=0.01):
+def maxFidelityNoisyChain(
+    grad, magneticorder=None, simulationparameters=None, ramp=None, dt=0.01, p=0.01
+):
     initialState, targetState, H, Htar, V, F = simulationparameters
 
     # Calculating the simulation time
@@ -110,15 +140,21 @@ def maxFidelityNoisyChain(grad, magneticorder=None, simulationparameters=None,
 
         # Renormalising the state
         currentState = normalizeSparse(currentState)
-        if magneticorder == 'AFM':
+        if magneticorder == "AFM":
             # Transforming the state into the space to calculate fidelity
             currentState_f = F.transpose() * V * currentState
 
             # Appending current fidelity to array
             f.append(abs(currentState_f).power(2).sum())
 
-        elif magneticorder == 'FM':
-            f.append(np.abs(np.dot(flatten(targetState.toarray()), flatten(currentState.toarray()))))
+        elif magneticorder == "FM":
+            f.append(
+                np.abs(
+                    np.dot(
+                        flatten(targetState.toarray()), flatten(currentState.toarray())
+                    )
+                )
+            )
 
         ramps.append(ramp[rampcounter])
         t_curr += dt
@@ -139,13 +175,13 @@ def initialiseSimulationThermal(N, magneticorder, rampdir, AFMState):
     initialState_fs = scipy.sparse.kron([0, 1], AFMState).transpose()
 
     # Loading the sparse matrix V\dagger and
-    V = scipy.sparse.load_npz('V_' + str(N) + '_allJ_Sz_1subspace.npz')
-    F = scipy.sparse.load_npz('F_' + str(N) + '_allJ_Sz_1subspace.npz')
+    V = scipy.sparse.load_npz("V_" + str(N) + "_allJ_Sz_1subspace.npz")
+    F = scipy.sparse.load_npz("F_" + str(N) + "_allJ_Sz_1subspace.npz")
 
     # Transforming initial state into contracted space
     initialState = V.transpose() * initialState_fs
 
-    H = scipy.sparse.load_npz('Hinitial_' + str(N) + rampdir + magneticorder + '.npz')
-    Htar = scipy.sparse.load_npz('Htarget_' + str(N) + rampdir + magneticorder + '.npz')
+    H = scipy.sparse.load_npz("Hinitial_" + str(N) + rampdir + magneticorder + ".npz")
+    Htar = scipy.sparse.load_npz("Htarget_" + str(N) + rampdir + magneticorder + ".npz")
 
     return initialState, targetState, H, Htar, V, F
